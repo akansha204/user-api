@@ -42,3 +42,26 @@ func TestToUserResponseWithoutAge(t *testing.T) {
 		t.Fatalf("unexpected response: %+v", got)
 	}
 }
+
+func TestNormalizePagination(t *testing.T) {
+	tests := []struct {
+		name      string
+		page      int
+		limit     int
+		wantPage  int
+		wantLimit int
+	}{
+		{name: "defaults", page: 0, limit: 0, wantPage: 1, wantLimit: 10},
+		{name: "clamps limit", page: 2, limit: 500, wantPage: 2, wantLimit: 100},
+		{name: "keeps valid", page: 3, limit: 25, wantPage: 3, wantLimit: 25},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			page, limit := normalizePagination(tt.page, tt.limit)
+			if page != tt.wantPage || limit != tt.wantLimit {
+				t.Fatalf("normalizePagination() = (%d, %d), want (%d, %d)", page, limit, tt.wantPage, tt.wantLimit)
+			}
+		})
+	}
+}

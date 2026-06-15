@@ -27,8 +27,8 @@ func (r *UserRepository) GetUserByID(ctx context.Context, id int32) (sqlc.User, 
 	return r.queries.GetUserByID(ctx, id)
 }
 
-func (r *UserRepository) ListUsers(ctx context.Context) ([]sqlc.User, error) {
-	return r.queries.ListUsers(ctx)
+func (r *UserRepository) ListUsers(ctx context.Context, limit, offset int32) ([]sqlc.User, error) {
+	return r.queries.ListUsers(ctx, sqlc.ListUsersParams{Limit: limit, Offset: offset})
 }
 
 func (r *UserRepository) UpdateUser(ctx context.Context, id int32, name string, dob time.Time) (sqlc.User, error) {

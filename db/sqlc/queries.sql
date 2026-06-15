@@ -11,7 +11,8 @@ WHERE id = $1;
 -- name: ListUsers :many
 SELECT id, name, dob
 FROM users
-ORDER BY id;
+ORDER BY id
+LIMIT $1 OFFSET $2;
 
 -- name: UpdateUser :one
 UPDATE users
@@ -23,4 +24,3 @@ RETURNING id, name, dob;
 -- name: DeleteUser :exec
 DELETE FROM users
 WHERE id = $1;
-

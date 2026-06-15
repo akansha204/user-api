@@ -11,6 +11,11 @@ import (
 )
 
 const dobLayout = "2006-01-02"
+const (
+	defaultPage  = 1
+	defaultLimit = 10
+	maxLimit     = 100
+)
 
 type UserService struct {
 	repo *repository.UserRepository
@@ -55,12 +60,15 @@ func (s *UserService) GetUserByID(ctx context.Context, id int32) (models.UserRes
 	return toUserResponse(user, true, s.now()), nil
 }
 
-func (s *UserService) ListUsers(ctx context.Context) ([]models.UserResponse, error) {
+func (s *UserService) ListUsers(ctx context.Context, page, limit int) ([]models.UserResponse, error) {
 	if s.repo == nil {
 		return nil, errors.New("repository not configured")
 	}
 
-	users, err := s.repo.ListUsers(ctx)
+	page, limit = normalizePagination(page, limit)
+	offset := int32((page - 1) * limit)
+
+	users, err := s.repo.ListUsers(ctx, int32(limit), offset)
 	if err != nil {
 		return nil, err
 	}
@@ -97,6 +105,19 @@ func (s *UserService) DeleteUser(ctx context.Context, id int32) error {
 	}
 
 	return s.repo.DeleteUser(ctx, id)
+}
+
+func normalizePagination(page, limit int) (int, int) {
+	if page < 1 {
+		page = defaultPage
+	}
+	if limit < 1 {
+		limit = defaultLimit
+	}
+	if limit > maxLimit {
+		limit = maxLimit
+	}
+	return page, limit
 }
 
 func toUserResponse(user sqlc.User, includeAge bool, now time.Time) models.UserResponse {

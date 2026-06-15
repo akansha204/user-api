@@ -42,6 +42,33 @@ export DB_SOURCE='postgres://postgres:postgres@localhost:5432/user_api?sslmode=d
 go run ./cmd/server
 ```
 
+## Docker
+
+```bash
+docker compose up --build
+```
+
+This starts PostgreSQL and the API container.
+
+## Pagination
+
+`GET /users` supports:
+
+- `page` default `1`
+- `limit` default `10`
+- max `limit` `100`
+
+Example:
+
+```bash
+GET /users?page=2&limit=20
+```
+
+## Middleware
+
+- `X-Request-Id` is injected into responses
+- request duration is logged with Zap
+
 ## API
 
 ### Create user

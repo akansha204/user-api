@@ -56,7 +56,12 @@ func (h *UserHandler) GetUserByID(c *fiber.Ctx) error {
 }
 
 func (h *UserHandler) ListUsers(c *fiber.Ctx) error {
-	users, err := h.service.ListUsers(c.Context())
+	page, limit, err := parsePagination(c)
+	if err != nil {
+		return err
+	}
+
+	users, err := h.service.ListUsers(c.Context(), page, limit)
 	if err != nil {
 		return mapServiceError(err)
 	}
@@ -97,6 +102,32 @@ func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	}
 
 	return c.SendStatus(http.StatusNoContent)
+}
+
+func parsePagination(c *fiber.Ctx) (int, int, error) {
+	page := 1
+	limit := 10
+
+	if raw := c.Query("page"); raw != "" {
+		value, err := strconv.Atoi(raw)
+		if err != nil || value < 1 {
+			return 0, 0, fiber.NewError(http.StatusBadRequest, "invalid page")
+		}
+		page = value
+	}
+
+	if raw := c.Query("limit"); raw != "" {
+		value, err := strconv.Atoi(raw)
+		if err != nil || value < 1 {
+			return 0, 0, fiber.NewError(http.StatusBadRequest, "invalid limit")
+		}
+		if value > 100 {
+			value = 100
+		}
+		limit = value
+	}
+
+	return page, limit, nil
 }
 
 func mapServiceError(err error) error {

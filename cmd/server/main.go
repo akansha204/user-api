@@ -36,6 +36,7 @@ func main() {
 	app := fiber.New(fiber.Config{
 		ErrorHandler: middleware.LogErrors(zapLogger),
 	})
+	app.Use(middleware.RequestContext(zapLogger))
 	app.Use(middleware.Recover(zapLogger))
 
 	routes.Register(app, userHandler)

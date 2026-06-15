@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: user_api
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d user_api"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    environment:
+      PORT: :3000
+      DB_DRIVER: postgres
+      DB_SOURCE: postgres://postgres:postgres@db:5432/user_api?sslmode=disable
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
