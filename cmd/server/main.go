@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
+	"user-api/config"
 	"user-api/internal/handler"
 	"user-api/internal/logger"
 	"user-api/internal/middleware"
@@ -14,26 +15,33 @@ import (
 )
 
 func main() {
+	cfg := config.Load()
+
 	zapLogger, err := logger.New()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer func() { _ = zapLogger.Sync() }()
 
+	db, err := repository.OpenDB(cfg.DBDriver, cfg.DBSource)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() { _ = db.Close() }()
+
+	repo := repository.NewUserRepository(db)
+	userService := service.NewUserService(repo)
+	userHandler := handler.NewUserHandler(userService)
+
 	app := fiber.New(fiber.Config{
 		ErrorHandler: middleware.LogErrors(zapLogger),
 	})
 	app.Use(middleware.Recover(zapLogger))
 
-	// TODO: replace with config-driven DB initialization in the next phase.
-	var repo *repository.UserRepository
-	userService := service.NewUserService(repo)
-	userHandler := handler.NewUserHandler(userService)
-
 	routes.Register(app, userHandler)
 
-	middleware.LogStartup(zapLogger, ":3000")
-	if err := app.Listen(":3000"); err != nil {
+	middleware.LogStartup(zapLogger, cfg.Address())
+	if err := app.Listen(cfg.Address()); err != nil {
 		log.Fatal(err)
 	}
 }
