@@ -1,0 +1,16 @@
+package service
+
+import "time"
+
+func CalculateAge(dob time.Time, now time.Time) int {
+	dob = dob.UTC()
+	now = now.UTC()
+
+	age := now.Year() - dob.Year()
+	birthdayThisYear := time.Date(now.Year(), dob.Month(), dob.Day(), 0, 0, 0, 0, time.UTC)
+	if now.Before(birthdayThisYear) {
+		age--
+	}
+
+	return age
+}
