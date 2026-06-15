@@ -1,20 +1,18 @@
 package models
 
-import "time"
-
 type CreateUserRequest struct {
-	Name string    `json:"name" validate:"required"`
-	Dob  time.Time `json:"dob" validate:"required"`
+	Name string `json:"name" validate:"required"`
+	Dob  string `json:"dob" validate:"required"`
 }
 
 type UpdateUserRequest struct {
-	Name string    `json:"name" validate:"required"`
-	Dob  time.Time `json:"dob" validate:"required"`
+	Name string `json:"name" validate:"required"`
+	Dob  string `json:"dob" validate:"required"`
 }
 
 type UserResponse struct {
-	ID   int32     `json:"id"`
-	Name string    `json:"name"`
-	Dob  time.Time `json:"dob"`
-	Age  int       `json:"age,omitempty"`
+	ID   int32  `json:"id"`
+	Name string `json:"name"`
+	Dob  string `json:"dob"`
+	Age  int    `json:"age,omitempty"`
 }

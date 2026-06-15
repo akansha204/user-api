@@ -20,7 +20,7 @@ func TestToUserResponseWithAge(t *testing.T) {
 	if got.Age != 36 {
 		t.Fatalf("Age = %d, want %d", got.Age, 36)
 	}
-	if got.ID != 1 || got.Name != "Alice" {
+	if got.ID != 1 || got.Name != "Alice" || got.Dob != "1990-05-10" {
 		t.Fatalf("unexpected response: %+v", got)
 	}
 }
@@ -38,7 +38,7 @@ func TestToUserResponseWithoutAge(t *testing.T) {
 	if got.Age != 0 {
 		t.Fatalf("Age = %d, want %d", got.Age, 0)
 	}
-	if got.ID != 2 || got.Name != "Bob" {
+	if got.ID != 2 || got.Name != "Bob" || got.Dob != "1995-07-01" {
 		t.Fatalf("unexpected response: %+v", got)
 	}
 }
